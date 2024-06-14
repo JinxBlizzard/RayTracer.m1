@@ -3,6 +3,9 @@ Inverse of the Matrix function with
 regard to the Matrix Operations
 required int the point projection */
 
+
+// Find Better Method
+
 #include <cstdint>
 #include <iostream>
 #include <cstring>
@@ -11,7 +14,7 @@ class Matrix4 {
 public:
     Matrix4() {
         memset(&matrix[0][0], 0x0, sizeof(float)*16);
-        matrix[0][0] = matrix[1][1] = matrix[2][2] = matrix[3][3] - 1.f;
+        matrix[0][0] = matrix[1][1] = matrix[2][2] = matrix[3][3] = 1.f;
     }
 
     Matrix4(const Matrix4& m) {
@@ -55,3 +58,42 @@ std::ostream& operator<<(std::ostream& os, const Matrix4& m) {
     return os;
 }
 
+Matrix4 Matrix4::Inverse() const {
+    Matrix4 s;
+    Matrix4 t(*this);
+
+    for (uint32_t i = 0; i < 3; ++i) {
+        uint32_t pivot = i;
+
+        float pivotsize = t[i][i];
+
+        if (pivotsize < 0) pivotsize = -pivotsize;
+
+        for (uint32_t j = i + 1; j < 4; j++) {
+            float tmp = t[j][i];
+
+            if(tmp < 0) tmp = -tmp;
+
+            if (tmp > pivotsize) {
+                pivot = j;
+                pivotsize = tmp;
+            }
+        }
+
+        if (pivotsize == 0) {return Matrix4();}
+
+        if(pivot != i) {
+            for (uint32_t j = 0; j < 4; j++) {
+                float tmp;
+
+                tmp = t[i][j];
+                t[i][j] = t[pivot][j];
+                t[pivot][j] = tmp;
+
+                tmp = s[i][j];
+                s[i][j] = s[pivot][j];
+
+            }
+        }
+    }
+}
